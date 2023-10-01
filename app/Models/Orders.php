@@ -26,6 +26,7 @@ class Orders extends Model
         'view',
     ];
    
+
     protected $dates =['delete_at'];
 
 
