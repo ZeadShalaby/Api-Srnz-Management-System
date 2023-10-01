@@ -23,6 +23,10 @@ class FavouriteController extends Controller
     {
         //
         $favourite = Favourite::where('user_id',auth()->user()->id)->get();
+        foreach ($favourite as $belong) {
+            $user =$belong->user; 
+            $orders =$belong->order; 
+        }
         return $this->returnData("Favourite",$favourite);
     }
 

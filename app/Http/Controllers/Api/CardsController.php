@@ -24,6 +24,11 @@ class CardsController extends Controller
     {
         // todo return my cards //
         $card = Cards::where('user_id',auth()->user()->id)->get();
+        foreach ($card as $belong) {
+            $department = $belong->department;
+            $user =$belong->user; 
+            $orders =$belong->order; 
+        }
         return $this->returnData("cards",$card);
     }
 

@@ -35,11 +35,14 @@ class OrdersController extends Controller
     
    
     // todo get all orders //
-    public function index(Request $request){
-
-        $orders = Orders::select('id','name_'.app()->getLocale().' as name ','view')->get();    //selectlange()->get();
+    public function index(Request $request,Orders $order){
+        $orders = Orders::select('id','name_'.app()->getLocale().' as name ','view','department_id','user_id')->get();    //selectlange()->get();
+        // todo belongs to with model orders //
+        foreach ($orders as $belong) {
+        $department = $belong->department;
+        $user =$belong->user; 
+        }
         return $this->returnData('orders',$orders);
-       
     }
      
 
@@ -147,10 +150,13 @@ class OrdersController extends Controller
     // todo get only one orders by id //
     public function getorders(Request $request,Orders $order){
         $order = Orders::find($request->id);
-        $orders = Orders::select('id','name_'.app()->getLocale().' as name ','description','user_id','path','view')->find($request->id);    //selectlange()->get();
-        event(new OrderVieweer($order));
+        $orders = Orders::select('id','name_'.app()->getLocale().' as name ','description','user_id',"department_id",'path','view')->find($request->id);    //selectlange()->get();
+        event(new OrderVieweer($order));   
         if(!$orders)
         return $this->returnError('404','Not Found Orders ');
+        // todo belongs to with model orders //
+        $department = $orders->department;
+        $user =$orders->user; 
         return $this->returnData('orders',$orders);
     } 
 
@@ -187,9 +193,17 @@ class OrdersController extends Controller
     {
         if(auth()->user()->role == Role::ADMIN){
             $orders_restore = Orders::onlyTrashed()->get();
+            foreach ($orders_restore as $belong) {
+                $department = $belong->department;
+                $user =$belong->user; 
+                }
             return $this->returnData("all_orders_restore",$orders_restore,"All Orders Restore .");     
         }
         $orders_restore = Orders::where('user_id',auth()->user()->id)->onlyTrashed()->get();
+        foreach ($orders_restore as $belong) {
+            $department = $belong->department;
+            $user =$belong->user; 
+            }
         return $this->returnData("your_orders_restore",$orders_restore,"your Orders Restore .");      
     }
 
@@ -215,6 +229,10 @@ class OrdersController extends Controller
           $filterResult = Orders::where('name_en', 'LIKE', '%'. $query. '%')
           ->orwhere('name_ar', 'LIKE', '%'. $query. '%')
           ->get();
+          foreach ($filterResult as $belong) {
+            $department = $belong->department;
+            $user =$belong->user; 
+            }
           return $this->returnData('search',$filterResult);
     } 
 }
