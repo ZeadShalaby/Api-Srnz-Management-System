@@ -28,6 +28,7 @@ class AssignGuard extends BaseMiddleware
             $token = $request->header('auth-token');
             $request->headers->set('auth_token', (string) $token, true);
             $request->headers->set('Authorization', 'Bearer '.$token, true);
+        
             try {
               //$user = $this->auth->authenticate($request);  //check authenticted user
                 $user = JWTAuth::parseToken()->authenticate();

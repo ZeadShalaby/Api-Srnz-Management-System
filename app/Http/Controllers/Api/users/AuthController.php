@@ -45,10 +45,11 @@ class AuthController extends Controller
         $credentials = $request->only(['email','password']);
         $tocken = Auth::guard('api')->attempt($credentials);
         $users =  Auth::guard('api')->user();
-        $users -> api_tocken = $tocken;
-
         if(!$tocken)
         return $this->returnError('E001','information not valid.');
+        
+        $users -> api_tocken = $tocken;
+
         
         // !return tocken
         return $this->returnData('Users',$users);
