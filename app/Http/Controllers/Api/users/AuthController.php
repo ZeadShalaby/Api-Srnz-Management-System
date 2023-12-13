@@ -89,6 +89,8 @@ class AuthController extends Controller
         return auth()->user();
     }
 
+   
+
 
     // todo Register New Customer
     public function register(Request $request,User $user){
@@ -109,6 +111,7 @@ class AuthController extends Controller
             }
         else{  
           if(Auth::user()->role == Role::CUSTOMER && Auth::user()->id ==$user){    
+
         User::create([
             'name'=> $request->name,
             'email'=> $request->email,
@@ -123,6 +126,37 @@ class AuthController extends Controller
         }
     }
 
+
+     // todo change image of departments //
+     public function changeimg(Request $request)
+     {
+         //
+         $users = Users::find($request->id);
+         $rules = [
+             "profile_photo" => "required|image|mimes:jpg,png,gif|max:2048"
+         ];
+         // ! valditaion
+         $validator = Validator::make($request->all(),$rules);
+ 
+         if($validator->fails()){
+                 $code = $this->returnCodeAccordingToInput($validator);
+                 return $this->returnValidationError($code,$validator);
+             }
+         else{
+             $folder = 'images/users';
+             $image_name = time().'.'.$request->file->extension();
+             $images = $request->file->move(public_path($folder),$image_name) ;
+             $path = env("APP_URL").env("Path_user").$image_name;
+             $users->update([
+                 'profile_photo'  => $path ,
+             ]);
+         }    
+         $msg = "users : ".$users->name." , Update successfully .";
+         return $this->returnSuccessMessage($msg);    
+     
+     }
+ 
+     
      //// todo update users ////
      public function update(Request $request){
         $user=User::find($request->id);
@@ -131,7 +165,6 @@ class AuthController extends Controller
             "email" => "required",
             "gmail" => "required",
             "phone" => "required",
-            'profile_photo'=>"required",
             "password" => "required",
         ];
         // ! valditaion
@@ -146,7 +179,6 @@ class AuthController extends Controller
                 'name'=> $request->name,
                 'email'=> $request->email,
                 'gmail'=>$request->gmail,
-                'profile_photo'=>$request->profile_photo,
                 'phone'=>$request->phone,
                 'password'=> $request->password,
              ]); 
@@ -154,5 +186,30 @@ class AuthController extends Controller
              return $this->returnSuccessMessage($msg);} 
     }
 
+
+
+    
+    // todo return users image
+    public function imagesuser(Request $request,$user){
+        if(isset($user)){
+          return $this->returnimageusers($user,$user);}
+        else {return 'null';}
+
+    }
+
+    // todo return users image
+    public function imagesord(Request $request,$ord){
+        if(isset($ord)){
+          return $this->returnimageord($ord,$ord);}
+        else {return 'null';}
+
+    }
+
+    // todo return users image
+    public function imagesdep(Request $request,$dep){
+        if(isset($dep)){
+          return $this->returnimagedep($dep,$dep);}
+        else {return 'null';}
+    }
    
 }

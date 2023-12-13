@@ -46,7 +46,7 @@ class DepartmentsController extends Controller
         $rules = [
             "name" => "required|unique:departments,name|string|min:4",
             "code" => "required|unique:departments,code|string|min:4",
-            "img" => "required"
+            "img" => "required|image|mimes:jpg,png,gif|max:2048"
         ];
         // ! valditaion
         $validator = Validator::make($request->all(),$rules);
@@ -55,13 +55,21 @@ class DepartmentsController extends Controller
                 $code = $this->returnCodeAccordingToInput($validator);
                 return $this->returnValidationError($code,$validator);
             }
-        
+        // todo POST image
+     
+       
         else {
+            $folder = 'images/departments';
+            $image_name = time().'.'.$request->file->extension();
+            $images = $request->file->move(public_path($folder),$image_name) ;
+            $path = env("APP_URL").env("Path_dep").$image_name;
             $department = Departments::create([
                 'name' => $request->name,
                 'code' => $request->code,
-                'img'  => $request->img ,
-                 ]);
+                'img'  => $path ,
+            ]);
+                 
+             
         }    
 
         return $this->returnSuccessMessage("Create Departments Successfully .");
@@ -89,6 +97,37 @@ class DepartmentsController extends Controller
         //
     }
 
+
+    // todo change image of departments //
+    public function changeimg(Request $request)
+    {
+        //
+        $department = Departments::find($request->id);
+        $rules = [
+            "img" => "required|image|mimes:jpg,png,gif|max:2048"
+        ];
+        // ! valditaion
+        $validator = Validator::make($request->all(),$rules);
+
+        if($validator->fails()){
+                $code = $this->returnCodeAccordingToInput($validator);
+                return $this->returnValidationError($code,$validator);
+            }
+        else{
+            $folder = 'images/departments';
+            $image_name = time().'.'.$request->file->extension();
+            $images = $request->file->move(public_path($folder),$image_name) ;
+            $path = env("APP_URL").env("Path_dep").$image_name;
+            $department->update([
+                'img'  => $path ,
+            ]);
+        }    
+        $msg = "Departments : ".$department->name." , Update successfully .";
+        return $this->returnSuccessMessage($msg);    
+    
+    }
+
+
     /**
      * todo Update the specified resource in storage.
      */
@@ -98,7 +137,6 @@ class DepartmentsController extends Controller
         $rules = [
             "name" => "required",
             "code" => "required",
-            "img" => "required"
         ];
         // ! valditaion
         $validator = Validator::make($request->all(),$rules);
@@ -111,7 +149,6 @@ class DepartmentsController extends Controller
             $department->update([
                 'name' => $request->name,
                 'code' => $request->code,
-                'img'  => $request->img ,
                  ]);
         }    
         $msg = "Departments : ".$department->name." , Update successfully .";

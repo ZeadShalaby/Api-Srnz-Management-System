@@ -91,7 +91,6 @@ class UserController extends Controller
             "email" => "required",
             "gmail" => "required",
             "phone" => "required",
-            'profile_photo'=>"required",
             "password" => "required",
         ];
         // ! valditaion
@@ -107,7 +106,6 @@ class UserController extends Controller
                 'name_ar'=> $request->name_ar,
                 'email'=> $request->email,
                 'gmail'=>$request->gmail,
-                'profile_photo'=>$request->profile_photo,
                 'phone'=>$request->phone,
                 'password'=> $request->password,
              ]); 
@@ -153,5 +151,36 @@ class UserController extends Controller
      $numfav = $this->countfavourite($favourite);
     return $this->returnData("users",["user"=>auth()->user(),"CountOrders"=>$numorders,"CountFav"=>$numfav]);
     }
+
+
+    
+     // todo change image of departments //
+     public function changeimg(Request $request)
+     {
+         //
+         $users = Users::find($request->id);
+         $rules = [
+             "profile_photo" => "required|image|mimes:jpg,png,gif|max:2048"
+         ];
+         // ! valditaion
+         $validator = Validator::make($request->all(),$rules);
+ 
+         if($validator->fails()){
+                 $code = $this->returnCodeAccordingToInput($validator);
+                 return $this->returnValidationError($code,$validator);
+             }
+         else{
+             $folder = 'images/users';
+             $image_name = time().'.'.$request->file->extension();
+             $images = $request->file->move(public_path($folder),$image_name) ;
+             $path = env("APP_URL").env("Path_user").$image_name;
+             $users->update([
+                 'profile_photo'  => $path ,
+             ]);
+         }    
+         $msg = "users : ".$users->name." , Update successfully .";
+         return $this->returnSuccessMessage($msg);    
+     
+     }
  
 }

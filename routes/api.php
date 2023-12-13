@@ -46,6 +46,16 @@ Route::group(['middleware' => ['api','checkvalidation','changelanguage']], funct
     Route::POST('logout',[AuthController::class, 'logout'])->middleware('auth.guard:api')->name('logout');
     //// ? return profile information ////
     Route::POST('profile',[AuthController::class, 'profile'])->middleware('auth.guard:api')->name('profile');
+
+    });
+
+    //! return image post or user or machine // 
+    Route::group(['prefix' =>'images','namespace' => 'users'], function () {
+
+        Route::get('imageusers/{service}',[AuthController::class, 'imagesuser']);
+        Route::get('imageord/{service}',[AuthController::class, 'imagesord']);
+        Route::get('imagedep/{service}',[AuthController::class, 'imagesdep']);
+    
     });
 
     // ! orders //
@@ -96,6 +106,25 @@ Route::group(['middleware' => ['api','checkvalidation','changelanguage','auth.gu
     
 });
 
+// ! all images //
+Route::group(['middleware' => ['api','checkvalidation','auth.guard:api','check.customer-role']], function () {
+
+Route::group(['prefix' =>'images','namespace' => 'users'], function () {
+    
+    // todo return image post | users | machine //
+    Route::POST('/srnz/profilephoto',[AuthController::class, 'imagesuser']);
+    Route::POST('/srnz/departments',[AuthController::class, 'depimage']);
+    Route::POST('/srnz/orders',[AuthController::class, 'ordimage']);
+        
+//! ////////////////////////////////////////////////////////////////////////////////////////
+
+    // todo return image post | users | machine //
+    Route::get('/srnzimageusers/{service}',[AuthController::class, 'imagesuser']);
+    Route::get('/srnzimagedep/{service}',[AuthController::class, 'imagesdep']);
+    Route::get('/srnzimageord/{service}',[AuthController::class, 'imagesord']);
+
+    });
+});
 
 // ! api here must be authentcated & Role = Customer //
 Route::group(['middleware' => ['api','checkvalidation','changelanguage','auth.guard:api','check.customer-role']], function () {

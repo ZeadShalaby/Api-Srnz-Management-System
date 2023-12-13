@@ -51,11 +51,11 @@ class OrdersController extends Controller
     {       
         $rules = [
             'path'=> 'required|image|mimes:jpg,png,gif|max:2048',
-            'price'=> 'required',
+            'price'=> 'required|integer',
             'description'=> 'required',
-            'department_id'=> 'required',
-            'name_en'=> 'required',
-            'name_ar'=> 'required'
+            'department_id'=> 'required|integer',
+            'name_en'=> 'required|unique:users,name_en',
+            'name_ar'=> 'required|unique:users,name_ar'
 
         ];       
         // ! valditaion
@@ -68,17 +68,12 @@ class OrdersController extends Controller
         if (!isset(auth()->user()->phone)) {
             return  $this -> returnError('', 'Some Thing Wrong check your phone number');
         }
-
-        else{
-        $sename = DB::table('orders')->where('name_en', $request->name)
-       ->orwhere('name_ar', $request->name)
-        ->value('id');  
-
-        if($sename > 0){
-            $msg= 'Name Oredy Eists .';
-            return $this->returnError('E0011',$msg);
-        }
+  
        else{
+            $folder = 'images/orders';
+            $image_name = time().'.'.$request->file->extension();
+            $images = $request->file->move(public_path($folder),$image_name) ;
+            $path = env("APP_URL").env("Path_ord").$image_name;
             $order = Orders::create([
                 'name_en'=> $request->name_en,
                 'name_ar'=>$request->name_ar,
@@ -88,25 +83,58 @@ class OrdersController extends Controller
                 'phone'=>Auth::user()->phone,
                 'description'=> $request->description,
                 'price'=> $request->price,
-                'path'=> $request->path,
+                'path'=> $path,
     
              ]);
                 $msg= 'Create successfuly .';
                 return $this->returnSuccessMessage($msg);
 
-            }}
+            }
         
     }
+
+
+    // todo change image of departments //
+    public function changeimg(Request $request)
+    {
+        //
+        $orders = Orders::find($request->id);
+        $rules = [
+            "path" => "required|image|mimes:jpg,png,gif|max:2048"
+        ];
+        // ! valditaion
+        $validator = Validator::make($request->all(),$rules);
+
+        if($validator->fails()){
+                $code = $this->returnCodeAccordingToInput($validator);
+                return $this->returnValidationError($code,$validator);
+            }
+        else{
+            $folder = 'images/orders';
+            $image_name = time().'.'.$request->file->extension();
+            $images = $request->file->move(public_path($folder),$image_name) ;
+            $path = env("APP_URL").env("Path_ord").$image_name;
+            $orders->update([
+                'path'  => $path ,
+            ]);
+        }    
+        $msg = "orders : ".$orders->name." , Update successfully .";
+        return $this->returnSuccessMessage($msg);    
+    
+    }
+
+
+
+
     public function update(Request $request,User $user)
     {       
         $order = Orders::find($request->id);
        
         if( (auth()->user()->role == Role::ADMIN)||($order->user_id == auth()->user()->id)){
         $rules = [
-            'path'=> 'required',
-            'price'=> 'required',
+            'price'=> 'required|integer',
             'description'=> 'required',
-            'department_id'=> 'required',
+            'department_id'=> 'required|integer',
             'name_en'=> 'required',
             'name_ar'=> 'required'
 
@@ -140,7 +168,6 @@ class OrdersController extends Controller
             'phone'=>$order->phone,
             'description'=> $request->description,
             'price'=> $request->price,
-            'path'=> $request->path,
          ]);
          $msg = 'Update : '.$order->name_en.' successfuly .';
          return $this->returnSuccessMessage($msg);

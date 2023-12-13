@@ -20,7 +20,12 @@ class OrdersFactory extends Factory
     {
         $departmentIds = Departments::pluck('id')->toArray();
         $userids = User::where('role', '2')->pluck('id')->toArray();
- 
+        $img = array("dep.jpg","ord.jpg","user.jpg") ;
+        $increment = random_int(0,2);
+        $destination_path = '/api/v1/images/imageord/';
+        $http_address = env('APP_URL');
+        $path = $http_address.$destination_path.$img[$increment];
+
         return [
             'name_ar' => 'عربي',
             'name_en' => $this->faker->unique()->regexify('[A-Z]{10}'),
@@ -30,7 +35,7 @@ class OrdersFactory extends Factory
             'phone'=>fake()->numberBetween($min = 123456789, $max = 98561237894),
             'description'=>fake()->text(),
             'price'=>fake()->numberBetween($min = 1000, $max = 100000),
-            'path'=>fake()->imageUrl($width=400, $height=400),
+            'path'=>$path,
             'view'=>null,
 
         ];

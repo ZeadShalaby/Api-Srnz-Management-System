@@ -61,8 +61,6 @@ class DatabaseSeeder extends Seeder
         'password' => Hash::make('admin'),
         'phone'=>fake()->numberBetween($min = 123456789, $max = 98561237894),
         'role' =>'1',
-        'profile_photo'=>fake()->imageUrl($width=400, $height=400),
-
         ]);
     
         //// todo add one customer ////
@@ -73,7 +71,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('admin'),
             'phone'=>fake()->numberBetween($min = 123456789, $max = 98561237894),
             'role' =>'2',
-            'profile_photo'=>fake()->imageUrl($width=400, $height=400),
       
         ]);
     

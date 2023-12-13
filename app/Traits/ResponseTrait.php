@@ -240,4 +240,23 @@ trait ResponseTrait
     }
 
 
+    // todo return image users I Want it
+    public function returnimageusers($key , $value , $msg = "" )
+    {
+        return response()->download(public_path('image/users/'.$value),$key);
+    }
+
+    // todo return image filemachine I Want it
+    public function returnimagedep($key , $value , $msg = "" )
+    {
+        return response()->download(public_path('image/departments/'.$value),$key);
+    }
+
+    // todo return image filemachine I Want it
+    public function returnimageord($key , $value , $msg = "" )
+    {
+        return response()->download(public_path('image/orders/'.$value),$key);
+    }
+
+
 }

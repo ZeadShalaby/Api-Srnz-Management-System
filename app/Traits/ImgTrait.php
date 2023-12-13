@@ -23,6 +23,26 @@ trait ImgTrait
     
      }
 
+     
+   // todo return image users I Want it
+   public function returnimageusers($key , $value , $msg = "" )
+   {
+      return response()->download(public_path('images/users/'.$value),$key);
+   }
+
+   // todo return image filemachine I Want it
+   public function returnimageord($key , $value , $msg = "" )
+   {
+      return response()->download(public_path('images/departments/'.$value),$key);
+   }
+
+   // todo return image filemachine I Want it
+   public function returnimagedep($key , $value , $msg = "" )
+   {
+      return response()->download(public_path('images/orders/'.$value),$key);
+   }
+
+
 
      //orders search    
      protected function OrSearch($request){
